@@ -14,8 +14,6 @@ interface SubjectForm {
 }
 
 
-
-
 interface SubjectProps {
     subjects: Array<SubjectForm>
 }
@@ -30,13 +28,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 
 
+
 export default function Subjects({ subjects }: SubjectProps) {
 
     const { data: subjectData, setData: subjectSetData, post: subjectPost, processing: subjectProcessing, errors: subjectErrors, reset: subjectReset } = useForm<SubjectForm>({
         subjectCode: '',
         subjectDescription: '',
     });
-
+    
     const addSubject: FormEventHandler = (e) => {
         e.preventDefault();
         subjectPost(route('subject.store'), {
@@ -45,9 +44,9 @@ export default function Subjects({ subjects }: SubjectProps) {
                     subjectReset('subjectCode'),
                     subjectReset('subjectDescription'),
                 ],
-            onSuccess: () => 
+          
                     
-
+    
         });
     }
 
