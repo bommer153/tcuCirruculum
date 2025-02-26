@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { FormEventHandler } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
 
 interface SubjectForm {
     subjectCode: string;
@@ -43,10 +44,10 @@ export default function Subjects({ subjects }: SubjectProps) {
                 [
                     subjectReset('subjectCode'),
                     subjectReset('subjectDescription'),
-                ],
-          
-                    
-    
+                ],         
+            onSuccess: () => {
+                toast("Wow so easy!");
+            },         
         });
     }
 
@@ -54,6 +55,7 @@ export default function Subjects({ subjects }: SubjectProps) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Subjects" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <ToastContainer />
                 <form className="grid auto-rows-min gap-4 md:grid-cols-3" onSubmit={addSubject}>
                     <div>
                         <Label htmlFor="subject" className="py-10">Subject Code</Label>
