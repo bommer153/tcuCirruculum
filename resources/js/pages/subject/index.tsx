@@ -5,10 +5,19 @@ import { Input } from '@/components/ui/input';
 import { Head, useForm } from '@inertiajs/react';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/input-error';
+import { Button } from '@/components/ui/button';
+import { FormEventHandler } from 'react';
 
 interface SubjectForm {
     subjectCode: string;
     subjectDescription: string;
+}
+
+
+
+
+interface SubjectProps {
+    subjects: Array<SubjectForm>
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -21,18 +30,32 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 
 
-export default function Subjects() {
+export default function Subjects({ subjects }: SubjectProps) {
 
-    const { data:subjectData, setData:subjectSetData, post:subjectPost, processing:subjectProcessing, errors:subjectErrors, reset:subjectReset } = useForm<SubjectForm>({
-        subjectCode:'',
-        subjectDescription:'',        
+    const { data: subjectData, setData: subjectSetData, post: subjectPost, processing: subjectProcessing, errors: subjectErrors, reset: subjectReset } = useForm<SubjectForm>({
+        subjectCode: '',
+        subjectDescription: '',
     });
+
+    const addSubject: FormEventHandler = (e) => {
+        e.preventDefault();
+        subjectPost(route('subject.store'), {
+            onFinish: () =>
+                [
+                    subjectReset('subjectCode'),
+                    subjectReset('subjectDescription'),
+                ],
+            onSuccess: () => 
+                    
+
+        });
+    }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Subjects" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+                <form className="grid auto-rows-min gap-4 md:grid-cols-3" onSubmit={addSubject}>
                     <div>
                         <Label htmlFor="subject" className="py-10">Subject Code</Label>
                         <Input
@@ -41,10 +64,11 @@ export default function Subjects() {
                             name="subjectCode"
                             required
                             autoFocus
-                            value=""
+                            value={subjectData.subjectCode}
                             onChange={(e) => subjectSetData("subjectCode", e.target.value)}
-                            placeholder="Subject Code"
+
                         />
+                        <InputError message={subjectErrors.subjectCode} />
                     </div>
 
                     <div>
@@ -55,18 +79,36 @@ export default function Subjects() {
                             name="subjectDescription"
                             required
                             autoFocus
-                            value=""
+                            value={subjectData.subjectDescription}
                             onChange={(e) => subjectSetData("subjectDescription", e.target.value)}
-                            placeholder="Subject"
                         />
+                        <InputError message={subjectErrors.subjectDescription} />
                     </div>
 
                     <div>
-                        
+                        <Label htmlFor="button" className="py-10"><br></br></Label>
+                        <Button type="submit" id="button" className="cursor-pointer">Add Subject</Button>
                     </div>
-                </div>
+                </form>
                 <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 rounded-xl border md:min-h-min">
-                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    <table>
+                        <thead className="">
+                            <tr>
+                                <th className="p-2">Subject Code</th>
+                                <th className="p-2">Subject Description</th>
+                                <th className="p-2"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            {subjects.map((subject, index) => (
+                                <tr key={index}>
+                                    <td className="p-2">{subject.subjectCode}</td>
+                                    <td className="p-2">{subject.subjectDescription}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </AppLayout>

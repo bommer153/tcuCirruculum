@@ -14,6 +14,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('dashboard');
     
     Route::get('subjects', [SubjectController::class, 'index'])->name('subject.index');
+    Route::post('subjects', [SubjectController::class, 'store'])->name('subject.store');
 });
 
 require __DIR__.'/settings.php';
