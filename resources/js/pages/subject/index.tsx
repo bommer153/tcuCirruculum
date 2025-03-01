@@ -2,13 +2,14 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Input } from '@/components/ui/input';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Route } from 'lucide-react';
 
 
 interface SubjectForm {
@@ -24,7 +25,7 @@ interface SubjectData {
 
 interface SubjectProps {
     subjects: Array<SubjectData>
-    success: string,
+    success?: string,
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -44,17 +45,32 @@ export default function Subjects({ subjects, success }: SubjectProps) {
   
     useEffect(() =>{    
         if(successMessage) {
+            console.log(successMessage)
             toast.success(successMessage)
             setSuccessMessage(null);
         }        
         
-    }),[successMessage]
+    }),[success]
 
     const { data: subjectData, setData: subjectSetData, post: subjectPost, processing: subjectProcessing, errors: subjectErrors, reset: subjectReset } = useForm<SubjectForm>({
         subjectCode: '',
         subjectDescription: '',
     });    
     
+    const deleteSubject = (id:number) => {
+       
+        if(window.confirm("Are you sure ?")){
+            router.delete(route('subjects.destroy',id),{
+                onSuccess: () => {
+                    toast.success("Subject Deleted Successfully")
+                },
+                onError: () => {
+                    toast.error("Failed to Delete Subject")
+                }
+            })
+        }
+    }
+
     const addSubject: FormEventHandler = (e) => {
         e.preventDefault();
         subjectPost(route('subjects.store'), {
@@ -62,7 +78,11 @@ export default function Subjects({ subjects, success }: SubjectProps) {
                 [
                     subjectReset('subjectCode'),
                     subjectReset('subjectDescription'),
-                ],         
+                ],  
+                
+            onSuccess: () => {
+                toast.success(successMessage)
+            }
                    
         });
     }
@@ -126,7 +146,7 @@ export default function Subjects({ subjects, success }: SubjectProps) {
                                         <Link href={route('subjects.edit',subject.id)} >
                                             <Button className="mr-5 bg-blue-200 cursor-pointer">Edit</Button>
                                         </Link>
-                                        <Button className="mr-5 bg-red-500 cursor-pointer text-white">Delete</Button>
+                                        <Button className="mr-5 bg-red-500 cursor-pointer text-white" onClick={() => deleteSubject(subject.id)}>Delete</Button>
                                     </TableCell>
                                 </TableRow>
                             ))}

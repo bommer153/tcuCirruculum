@@ -11,7 +11,8 @@ class SubjectController extends Controller
 
         $subjects = subjects::get();
         return Inertia::render('subject/index',props: [
-            'subjects' => $subjects
+            'subjects' => $subjects,
+    
         ]);
     }
 
@@ -40,5 +41,11 @@ class SubjectController extends Controller
        
         $insertSubject = Subjects::create($request->all());    
         return to_route('subjects.index')->with('success', 'Subject Added');
+    }
+
+    public function destroy(Subjects $subject){
+      
+        $subject->delete();        
+        return to_route('subjects.index')->with('success', 'Subject Deleted');
     }
 }
