@@ -2,21 +2,29 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Input } from '@/components/ui/input';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
 
 interface SubjectForm {
     subjectCode: string;
     subjectDescription: string;
 }
 
+interface SubjectData {
+    id: number;
+    subjectCode: string;
+    subjectDescription: string;
+}
 
 interface SubjectProps {
-    subjects: Array<SubjectForm>
+    subjects: Array<SubjectData>
+    success: string,
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -30,24 +38,32 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 
 
-export default function Subjects({ subjects }: SubjectProps) {
+export default function Subjects({ subjects, success }: SubjectProps) {
+
+    const [successMessage, setSuccessMessage] = useState(success || null);
+  
+    useEffect(() =>{    
+        if(successMessage) {
+            toast.success(successMessage)
+            setSuccessMessage(null);
+        }        
+        
+    }),[successMessage]
 
     const { data: subjectData, setData: subjectSetData, post: subjectPost, processing: subjectProcessing, errors: subjectErrors, reset: subjectReset } = useForm<SubjectForm>({
         subjectCode: '',
         subjectDescription: '',
-    });
+    });    
     
     const addSubject: FormEventHandler = (e) => {
         e.preventDefault();
-        subjectPost(route('subject.store'), {
+        subjectPost(route('subjects.store'), {
             onFinish: () =>
                 [
                     subjectReset('subjectCode'),
                     subjectReset('subjectDescription'),
                 ],         
-            onSuccess: () => {
-                toast("Wow so easy!");
-            },         
+                   
         });
     }
 
@@ -92,24 +108,30 @@ export default function Subjects({ subjects }: SubjectProps) {
                     </div>
                 </form>
                 <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 rounded-xl border md:min-h-min">
-                    <table>
-                        <thead className="">
-                            <tr>
-                                <th className="p-2">Subject Code</th>
-                                <th className="p-2">Subject Description</th>
-                                <th className="p-2"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="p-2">Subject Code</TableHead>
+                                <TableHead className="p-2">Subject Description</TableHead>
+                                <TableHead className="p-2"></TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
 
                             {subjects.map((subject, index) => (
-                                <tr key={index}>
-                                    <td className="p-2">{subject.subjectCode}</td>
-                                    <td className="p-2">{subject.subjectDescription}</td>
-                                </tr>
+                                <TableRow key={index}>
+                                    <TableCell className="p-2">{subject.subjectCode}</TableCell>
+                                    <TableCell className="p-2">{subject.subjectDescription}</TableCell>
+                                    <TableCell className="p-2">
+                                        <Link href={route('subjects.edit',subject.id)} >
+                                            <Button className="mr-5 bg-blue-200 cursor-pointer">Edit</Button>
+                                        </Link>
+                                        <Button className="mr-5 bg-red-500 cursor-pointer text-white">Delete</Button>
+                                    </TableCell>
+                                </TableRow>
                             ))}
-                        </tbody>
-                    </table>
+                        </TableBody>
+                    </Table>
                 </div>
             </div>
         </AppLayout>
